@@ -8,7 +8,6 @@ local function getCurrentRootLevelNode()
   end
 
   local root_node = ts_utils.get_root_for_node(curr_node)
-
   local parent = curr_node:parent()
 
   while (parent ~= nil and parent ~= root_node) do
@@ -33,7 +32,6 @@ end
 local function go_to_node(node)
   if node ~= nil then
     ts_utils.goto_node(node)
-    print("Current Treesitter Node is of type:", node:type())
   end
 end
 
@@ -53,17 +51,7 @@ local function getPreviousRootLvlNode(jump_count)
   go_to_node(prev)
 end
 
-vim.api.nvim_create_user_command("TSPrevRootLevelNode", function(arg)
-  getPreviousRootLvlNode(arg.count)
-end, {
-  count = true
-})
-
-vim.api.nvim_create_user_command("TSNextRootLevelNode", function(arg)
-  getNextRootLevelNode(arg.count)
-end, {
-  count = true
-})
-
-vim.keymap.set("n", "<up>", function() getPreviousRootLvlNode(vim.v.count) end)
-vim.keymap.set("n", "<down>", function() getNextRootLevelNode(vim.v.count) end)
+return {
+  go_to_prev = function() getPreviousRootLvlNode(vim.v.count) end,
+  go_to_next = function() getNextRootLevelNode(vim.v.count) end
+}
