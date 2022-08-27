@@ -7,7 +7,10 @@ use 'gnarus-g/ts-node-jumps.nvim'
 ```
 ## Usage
 ```lua
-require "ts-node-jumps"
+local node_jumps = require "ts-node-jumps"
+
+vim.keymap.set("n", "<up>", node_jumps.go_to_prev)
+vim.keymap.set("n", "<down>", node_jumps.go_to_next)
 ```
 ### Keymaps
 <kbd>Up</kbd> or <kbd>Down</kbd> to jump one node.  
