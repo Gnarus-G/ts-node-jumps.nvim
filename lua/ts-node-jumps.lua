@@ -15,7 +15,8 @@ local function getCurrentRootLevelNode()
     parent = curr_node:parent()
   end
 
-  return curr_node
+  local isRootNode = curr_node == root_node
+  return curr_node, isRootNode
 end
 
 local function jump_from(node, jump_count, next_node)
@@ -35,8 +36,21 @@ local function go_to_node(node)
   end
 end
 
+local function move_cursor_vertically(inc)
+  local curr_win = vim.api.nvim_get_current_win();
+  local cursor = vim.api.nvim_win_get_cursor(curr_win);
+  cursor[1] = cursor[1] + inc;
+  vim.api.nvim_win_set_cursor(curr_win, cursor)
+end
+
 local function getNextRootLevelNode(jump_count)
-  local rl_node = getCurrentRootLevelNode()
+  local rl_node, isRoot = getCurrentRootLevelNode()
+
+  if isRoot then
+    pcall(move_cursor_vertically, 1)
+    return
+  end
+
   local next = jump_from(rl_node, jump_count, function(node)
     return node:next_sibling()
   end)
@@ -44,7 +58,13 @@ local function getNextRootLevelNode(jump_count)
 end
 
 local function getPreviousRootLvlNode(jump_count)
-  local rl_node = getCurrentRootLevelNode()
+  local rl_node, isRoot = getCurrentRootLevelNode()
+
+  if isRoot then
+    pcall(move_cursor_vertically, -1)
+    return
+  end
+
   local prev = jump_from(rl_node, jump_count, function(node)
     return node:prev_sibling()
   end)
