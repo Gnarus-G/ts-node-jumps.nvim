@@ -1,10 +1,12 @@
 local ts_utils = require "nvim-treesitter.ts_utils"
 
+---@return TSNode?
+---@return boolean
 local function getCurrentRootLevelNode()
   local curr_node = ts_utils.get_node_at_cursor()
 
   if curr_node == nil then
-    return nil; --[[  "No Treesitter parser found." ]]
+    return nil, false; --[[  "No Treesitter parser found." ]]
   end
 
   local root_node = ts_utils.get_root_for_node(curr_node)
@@ -19,23 +21,29 @@ local function getCurrentRootLevelNode()
   return curr_node, isRootNode
 end
 
+--- @param node TSNode
+--- @param jump_count number
+--- @param next_node fun(n: TSNode): TSNode?
+--- @return TSNode
 local function jump_from(node, jump_count, next_node)
-  local to_node = node;
   for _ = 1, jump_count ~= 0 and jump_count or 1 do
-    if next_node(to_node) == nil then
-      break
+    local n = next_node(node);
+
+    if n == nil then
+      return node
     end
-    to_node = next_node(to_node)
+    return n
   end
-  return to_node;
 end
 
+---@param node TSNode?
 local function go_to_node(node)
   if node ~= nil then
     ts_utils.goto_node(node)
   end
 end
 
+--- @param inc number
 local function move_cursor_vertically(inc)
   local curr_win = vim.api.nvim_get_current_win();
   local cursor = vim.api.nvim_win_get_cursor(curr_win);
@@ -43,6 +51,7 @@ local function move_cursor_vertically(inc)
   vim.api.nvim_win_set_cursor(curr_win, cursor)
 end
 
+--- @param jump_count number
 local function getNextRootLevelNode(jump_count)
   local rl_node, isRoot = getCurrentRootLevelNode()
 
@@ -57,6 +66,7 @@ local function getNextRootLevelNode(jump_count)
   go_to_node(next)
 end
 
+--- @param jump_count number
 local function getPreviousRootLvlNode(jump_count)
   local rl_node, isRoot = getCurrentRootLevelNode()
 
