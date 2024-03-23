@@ -4,7 +4,7 @@ local function getCurrentRootLevelNode()
   local curr_node = ts_utils.get_node_at_cursor()
 
   if curr_node == nil then
-    error("No Treesitter parser found.")
+    return nil; --[[  "No Treesitter parser found." ]]
   end
 
   local root_node = ts_utils.get_root_for_node(curr_node)
@@ -46,7 +46,7 @@ end
 local function getNextRootLevelNode(jump_count)
   local rl_node, isRoot = getCurrentRootLevelNode()
 
-  if isRoot then
+  if isRoot or not rl_node then
     pcall(move_cursor_vertically, 1)
     return
   end
@@ -60,7 +60,7 @@ end
 local function getPreviousRootLvlNode(jump_count)
   local rl_node, isRoot = getCurrentRootLevelNode()
 
-  if isRoot then
+  if isRoot or not rl_node then
     pcall(move_cursor_vertically, -1)
     return
   end
