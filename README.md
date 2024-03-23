@@ -1,10 +1,17 @@
 # ts-node-jumps.nvim
 Easily jump between root level nodes in code.
 ## Install
-[packer.nvim](https://github.com/wbthomason/packer.nvim)
+With [packer.nvim](https://github.com/wbthomason/packer.nvim)
+
 ```lua
-use 'gnarus-g/ts-node-jumps.nvim'
+use {
+  'gnarus-g/ts-node-jumps.nvim',
+  requires = {
+    "nvim-treesitter/nvim-treesitter"
+  }
+}
 ```
+
 ## Usage
 ```lua
 local node_jumps = require "ts-node-jumps"
