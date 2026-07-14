@@ -1,15 +1,17 @@
-local ts_utils = require "nvim-treesitter.ts_utils"
-
 ---@return TSNode?
 ---@return boolean
 local function getCurrentRootLevelNode()
-  local curr_node = ts_utils.get_node_at_cursor()
+  local ok, curr_node = pcall(vim.treesitter.get_node, { ignore_injections = false })
 
-  if curr_node == nil then
+  if not ok or curr_node == nil then
     return nil, false; --[[  "No Treesitter parser found." ]]
   end
 
-  local root_node = ts_utils.get_root_for_node(curr_node)
+  local root_node = curr_node
+  while root_node:parent() ~= nil do
+    root_node = root_node:parent()
+  end
+
   local parent = curr_node:parent()
 
   while (parent ~= nil and parent ~= root_node) do
@@ -39,7 +41,13 @@ end
 ---@param node TSNode?
 local function go_to_node(node)
   if node ~= nil then
-    ts_utils.goto_node(node)
+    local window = vim.api.nvim_get_current_win()
+    local buffer = vim.api.nvim_win_get_buf(window)
+    local cursor = vim.api.nvim_win_get_cursor(window)
+    vim.api.nvim_buf_set_mark(buffer, "'", cursor[1], cursor[2], {})
+
+    local row, column = node:start()
+    vim.api.nvim_win_set_cursor(window, { row + 1, column })
   end
 end
 
